@@ -1,0 +1,14 @@
+<form (ngSubmit)="onSubmit()">
+    <mat-dialog-content class="mat-typography">
+        <h1 mat-dialog-title>Import snus from a URL</h1>
+        <mat-form-field>
+            <mat-label>URL</mat-label>
+            <input matInput type="url" value="" name="url" [(ngModel)]="url">
+        </mat-form-field>
+    </mat-dialog-content>
+
+    <mat-dialog-actions>
+        <button matButton mat-dialog-close>Cancel</button>
+        <button matButton [mat-dialog-close]="true" cdkFocusInitial type="submit">Ok</button>
+    </mat-dialog-actions>
+</form>

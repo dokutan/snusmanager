@@ -1,0 +1,22 @@
+<mat-grid-list cols="4">
+    @for (s of snus; track s.name) {
+    <mat-grid-tile>
+        <mat-card appearance="outlined" style="max-width: 400px;">
+        <mat-card-header>
+            <mat-card-title>{{s.name}}</mat-card-title>
+            @if (s.rating) {
+                <mat-card-subtitle>{{s.rating}}/10</mat-card-subtitle>
+            }
+        </mat-card-header>
+
+        <img mat-card-image src="http://127.0.0.1:5000/api/thumbnail/{{s.id}}" alt="{{s.name}}">  
+        <mat-card-content>
+
+        </mat-card-content>
+        <mat-card-actions>
+            <button matButton>EDIT</button>
+        </mat-card-actions>
+        </mat-card>
+    </mat-grid-tile>
+    }
+</mat-grid-list>
