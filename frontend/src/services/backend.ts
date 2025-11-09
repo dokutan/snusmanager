@@ -6,7 +6,7 @@ import { Snus } from '../snus';
   providedIn: 'root'
 })
 export class Backend {
-  private url = 'http://127.0.0.1:5000/api/'; // http://jsonplaceholder.typicode.com/posts
+  private url = 'http://127.0.0.1:5000/api/';
    
   constructor(private httpClient: HttpClient) { }
   
@@ -16,6 +16,10 @@ export class Backend {
 
   getSnus(){
     return this.httpClient.get(this.url + "snus");
+  }
+
+  getSnusById(id: number){
+    return this.httpClient.get(this.url + "snus/" + id);
   }
 
   getSnusTypes(){
@@ -35,5 +39,9 @@ export class Backend {
     this.httpClient.post(this.url + "snus/from_url", {"url": url}).subscribe(response => {
       console.log(response);
     });
+  }
+
+  deleteSnus(id: number){
+    this.httpClient.delete(this.url + "snus/" + id).subscribe(_response => { });
   }
 }

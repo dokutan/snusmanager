@@ -45,12 +45,7 @@ export class AddSnus {
   snustypes: any = [];
   snus: Snus = new Snus();
 
-  constructor(private service: Backend) { }
-
-  //constructor() {
-  //this.data = data
-  //}
-  //data: any;
+  constructor(private service: Backend, @Inject(MAT_DIALOG_DATA) public data: {action: "add"|"edit", id: number|null}) { }
 
   ngOnInit() {
     this.service.getLocations()
@@ -61,6 +56,19 @@ export class AddSnus {
       .subscribe(response => {
         this.snustypes = response;
       });
+
+    if(this.data.action == "edit" && this.data.id) {
+      this.service.getSnusById(this.data.id)
+        .subscribe(response => {
+          this.snus = response as Snus;
+        });
+    }
+  }
+
+  onDelete(id: number | null) {
+    if(id) {
+      this.service.deleteSnus(id);
+    }
   }
 
   onSubmit() {

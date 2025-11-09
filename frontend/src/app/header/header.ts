@@ -43,7 +43,7 @@ export class Header {
   constructor(private service: Backend) {}
 
   addSnus() {
-    this.dialog.open(AddSnus, {data: {name: "test"}})
+    this.dialog.open(AddSnus, {data: {action: "add"}})
   }
 
   importSnus() {

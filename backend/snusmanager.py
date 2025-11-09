@@ -140,6 +140,24 @@ def get_snus():
         return {"error": "Invalid snus type"}, 400
 
 
+@app.route("/api/snus/<int:snusid>")
+def get_snus_by_id(snusid: int):
+    """
+    get a snus by id
+    ---
+    responses:
+      200:
+        description: A list of snus
+    """
+    conn = get_db_connection()
+    snus = conn.execute("SELECT * FROM snus WHERE id = ?", (snusid, )).fetchone()
+    print(snus)
+    if snus is not None:
+        return dict(snus)
+    else:
+        return {"error": "No snus with id %s" % snusid}, 400
+
+
 @app.route('/api/snus', methods=['POST'])
 def add_snus():
     """
