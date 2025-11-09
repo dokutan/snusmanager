@@ -13,6 +13,7 @@ class Snus:
     portion_g: float | None = None
     snustype: str = "other"
     image: bytes | None = None
+    image_mime: str | None = None
 
 
 def mysnus_com(content: str) -> Snus:
@@ -26,6 +27,7 @@ def mysnus_com(content: str) -> Snus:
     if m := re.search(r'"full":"(https:\\/\\/www.mysnus.com\\/media\\/mf_webp\\/png\\/media\\/catalog\\/product\\/cache\\/[^"]+\\/[^/"]+)"', content):
         image_url = m.group(1).replace("\\/", "/")
         snus.image = urlopen(image_url).read()
+        snus.image_mime = "image/webp"
     return snus
 
 

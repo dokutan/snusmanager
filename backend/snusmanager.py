@@ -243,8 +243,8 @@ def add_snus_from_url():
         conn.commit()
         snusid = conn.execute("SELECT MAX(id) FROM snus WHERE name = ?", (snus.name, )).fetchone()[0]
         print(f"id = {snusid}")
-        if snus.image is not None:
-            conn.execute("INSERT INTO image (snusid, file) VALUES (?, ?)", (snusid, snus.image))
+        if snus.image is not None and snus.image_mime is not None:
+            conn.execute("INSERT INTO image (snusid, file, mime) VALUES (?, ?, ?)", (snusid, snus.image, snus.image_mime))
             conn.commit()
         return Response(status=200)
     except Exception as e:
@@ -277,8 +277,8 @@ def get_thumbnail(snusid: int):
         description: An image
     """
     conn = get_db_connection()
-    image = conn.execute("SELECT file FROM image WHERE snusid = ?", (snusid, )).fetchone()
+    image = conn.execute("SELECT file, mime FROM image WHERE snusid = ?", (snusid, )).fetchone()
     if image is not None:
-        return send_file(io.BytesIO(image[0]), mimetype='image/webp')
+        return send_file(io.BytesIO(image[0]), mimetype=image[1])
     else:
         return send_file(io.BytesIO(DEFAULT_THUMBNAIL), mimetype='image/webp')
