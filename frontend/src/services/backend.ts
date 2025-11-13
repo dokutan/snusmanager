@@ -33,6 +33,10 @@ export class Backend {
     });
   }
 
+  updateSnus(id: number, snus: Snus){
+    this.httpClient.patch(this.url + "snus/" + id, snus).subscribe(_response => { });
+  }
+
   importSnus(url: string){
     console.log("import: " + url);
     //this.httpClient.post(this.url + "snus/from_url", {"url": url});

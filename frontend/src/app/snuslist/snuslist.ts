@@ -5,7 +5,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { Backend } from '../../services/backend';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
 
-import { AddSnus } from '../add-snus/add-snus';
+import { EditSnus } from '../edit-snus/edit-snus';
 
 @Component({
   selector: 'app-snuslist',
@@ -18,7 +18,7 @@ export class Snuslist {
 
   readonly dialog: MatDialog = inject(MatDialog);
 
-  constructor(private service: Backend ) { }
+  constructor(private service: Backend) { }
 
   ngOnInit() {
     this.service.getSnus()
@@ -28,6 +28,6 @@ export class Snuslist {
   }
 
   editSnus(id: number) {
-    this.dialog.open(AddSnus, {data: {action: "edit", id: id}})
+    this.dialog.open(EditSnus, {data: {action: "edit", id: id}})
   }
 }

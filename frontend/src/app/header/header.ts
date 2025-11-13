@@ -11,7 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { Dialog } from '@angular/cdk/dialog';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { TitleCasePipe } from '@angular/common';
-import { AddSnus } from '../add-snus/add-snus';
+import { EditSnus } from '../edit-snus/edit-snus';
 import { ImportSnus } from '../import-snus/import-snus';
 import { Backend } from '../../services/backend';
 
@@ -40,10 +40,10 @@ export class Header {
 
   readonly dialog: MatDialog = inject(MatDialog);
 
-  constructor(private service: Backend) {}
+  constructor(private service: Backend) { }
 
   addSnus() {
-    this.dialog.open(AddSnus, {data: {action: "add"}})
+    this.dialog.open(EditSnus, {data: {action: "add"}})
   }
 
   importSnus() {

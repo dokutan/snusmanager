@@ -42,6 +42,13 @@
 
         <br>
 
+        <mat-form-field style="margin-right: 0.5em;">
+            <mat-label>Description</mat-label>
+            <textarea matInput [(ngModel)]="snus.description" name="description"></textarea>
+        </mat-form-field>
+
+        <br>
+
         <h2>Strength and size</h2>
         <mat-form-field style="margin-right: 0.5em;">
             <mat-label>Nicotine mg/g</mat-label>
@@ -55,23 +62,25 @@
             <mat-label>Portion size (g)</mat-label>
             <input matInput type="number" value="" [(ngModel)]="snus.portion_g" name="portion_g">
         </mat-form-field>
+        <mat-form-field style="margin-right: 0.5em;">
+            <mat-label>Total weight (g)</mat-label>
+            <input matInput type="number" value="" [(ngModel)]="snus.weight_g" name="weight_g">
+        </mat-form-field>
+        <mat-form-field style="margin-right: 0.5em;">
+            <mat-label>Portions</mat-label>
+            <input matInput type="number" value="" [(ngModel)]="snus.portions" name="portions">
+        </mat-form-field>
         <br>
 
         <h2>Amount</h2>
+        @for (l of locations; track l.name) {
+        {{l.name}}
         <mat-form-field style="margin-right: 0.5em;">
             <mat-label>Amount</mat-label>
             <input matInput type="number" value="">
         </mat-form-field>
-
-        <mat-form-field style="margin-right: 0.5em;">
-            <mat-label>Location</mat-label>
-            <mat-select style="display: inline;">
-                <mat-option>None</mat-option>
-                @for (l of locations; track l.name) {
-                <mat-option value="{{l.name}}">{{l.name}}</mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
+        <br>
+        }
 
         <br>
     </mat-dialog-content>

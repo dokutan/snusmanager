@@ -6,5 +6,7 @@ export class Snus {
     nicotine_g: number | null = null;
     nicotine_portion: number | null = null;
     portion_g: number | null = null;
+    weight_g: number | null = null;
+    portions: number | null = null;
     type: string = "";
 }

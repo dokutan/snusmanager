@@ -21,7 +21,7 @@ import { Backend } from '../../services/backend';
 import { Snus } from '../../snus';
 
 @Component({
-  selector: 'app-add-snus',
+  selector: 'app-edit-snus',
   standalone: true,
   imports: [
     MatFormFieldModule,
@@ -36,11 +36,11 @@ import { Snus } from '../../snus';
     CommonModule,
     MatDialogModule
   ],
-  templateUrl: './add-snus.html',
-  styleUrl: './add-snus.css'
+  templateUrl: './edit-snus.html',
+  styleUrl: './edit-snus.css'
 })
 //@Injectable({ providedIn: 'any' })
-export class AddSnus {
+export class EditSnus {
   locations: any = [];
   snustypes: any = [];
   snus: Snus = new Snus();
@@ -61,6 +61,7 @@ export class AddSnus {
       this.service.getSnusById(this.data.id)
         .subscribe(response => {
           this.snus = response as Snus;
+          console.log(this.snus)
         });
     }
   }
@@ -72,6 +73,15 @@ export class AddSnus {
   }
 
   onSubmit() {
-    this.service.addSnus(this.snus);
+    switch (this.data.action) {
+      case "add":
+          this.service.addSnus(this.snus);
+        break;
+      case "edit":
+          if(this.snus.id) this.service.updateSnus(this.snus.id, this.snus);
+        break;
+      default:
+        break;
+    }
   }
 }

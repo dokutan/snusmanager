@@ -36,6 +36,8 @@ def init_db():
                 nicotine_g REAL CHECK(nicotine_g >= 0),
                 nicotine_portion REAL CHECK(nicotine_portion >= 0),
                 portion_g REAL CHECK(portion_g > 0),
+                weight_g REAL CHECK(weight_g > 0),
+                portions INTEGER CHECK(portions > 0),
                 type TEXT CHECK(type in (%s))
             ) STRICT
         """ % ", ".join([f"'{t}'" for t in SNUS_TYPES]))
@@ -87,9 +89,12 @@ def get_locations():
       200:
         description: A list of locations
     """
-    conn = get_db_connection()
-    locations = conn.execute("SELECT * FROM location").fetchall()
-    return [dict(l) for l in locations]
+    try:
+        conn = get_db_connection()
+        locations = conn.execute("SELECT * FROM location").fetchall()
+        return [dict(l) for l in locations]
+    except Exception as e:
+        return {"error": "An error occurred: " + str(e)}, 500
 
 
 @app.route("/api/locations/<string:name>", methods=["POST"])
@@ -107,10 +112,13 @@ def post_location(name: str):
       200:
         description: location created successfully
     """
-    conn = get_db_connection()
-    locations = conn.execute(f"INSERT INTO location(name) VALUES (?)", (name,))
-    conn.commit()
-    return Response(status=200)
+    try:
+        conn = get_db_connection()
+        locations = conn.execute(f"INSERT INTO location(name) VALUES (?)", (name,))
+        conn.commit()
+        return Response(status=200)
+    except Exception as e:
+        return {"error": "An error occurred: " + str(e)}, 500
 
 
 @app.route("/api/snus")
@@ -127,17 +135,20 @@ def get_snus():
       200:
         description: A list of snus
     """
-    snustype = request.args.get("type")
-    if snustype is None:
-        conn = get_db_connection()
-        snus = conn.execute("SELECT * FROM snus").fetchall()
-        return [dict(s) for s in snus]
-    elif snustype in SNUS_TYPES:
-        conn = get_db_connection()
-        snus = conn.execute("SELECT * FROM snus WHERE type = ?", (snustype, )).fetchall()
-        return [dict(s) for s in snus]
-    else:
-        return {"error": "Invalid snus type"}, 400
+    try:
+        snustype = request.args.get("type")
+        if snustype is None:
+            conn = get_db_connection()
+            snus = conn.execute("SELECT * FROM snus").fetchall()
+            return [dict(s) for s in snus]
+        elif snustype in SNUS_TYPES:
+            conn = get_db_connection()
+            snus = conn.execute("SELECT * FROM snus WHERE type = ?", (snustype, )).fetchall()
+            return [dict(s) for s in snus]
+        else:
+            return {"error": "Invalid snus type"}, 400
+    except Exception as e:
+        return {"error": "An error occurred: " + str(e)}, 500
 
 
 @app.route("/api/snus/<int:snusid>")
@@ -149,13 +160,15 @@ def get_snus_by_id(snusid: int):
       200:
         description: A list of snus
     """
-    conn = get_db_connection()
-    snus = conn.execute("SELECT * FROM snus WHERE id = ?", (snusid, )).fetchone()
-    print(snus)
-    if snus is not None:
-        return dict(snus)
-    else:
-        return {"error": "No snus with id %s" % snusid}, 400
+    try:
+        conn = get_db_connection()
+        snus = conn.execute("SELECT * FROM snus WHERE id = ?", (snusid, )).fetchone()
+        if snus is not None:
+            return dict(snus)
+        else:
+            return {"error": "No snus with id %s" % snusid}, 400
+    except Exception as e:
+        return {"error": "An error occurred: " + str(e)}, 500
 
 
 @app.route('/api/snus', methods=['POST'])
@@ -167,36 +180,90 @@ def add_snus():
       200:
         description: A list of snus
     """
-    # Get the data from the request
-    data = request.json
-    
-    # Validate the data
-    if not data:
-        return {"error": "No data provided in the request"}, 400
-    
-    name = data.get('name')
-    description = data.get('description')
-    rating = data.get('rating')
-    nicotine_g = data.get('nicotine_g')
-    nicotine_portion = data.get('nicotine_portion')
-    portion_g = data.get('portion_g')
-    snustype = data.get('type')
-    
-    # Check if required fields are present
-    if not name:
-        return {"error": "Missing name"}, 400
-
-    # Ensure the type is in the allowed types
-    if snustype not in SNUS_TYPES:
-        return {"error": "Invalid snus type"}, 400
-
-    # Insert the snus into the database
     try:
+        # Get the data from the request
+        data = request.json
+
+        # Validate the data
+        if not data:
+            return {"error": "No data provided in the request"}, 400
+
+        name = data.get('name')
+        description = data.get('description')
+        rating = data.get('rating')
+        nicotine_g = data.get('nicotine_g')
+        nicotine_portion = data.get('nicotine_portion')
+        portion_g = data.get('portion_g')
+        weight_g = data.get('weight_g')
+        portions = data.get('portions')
+        snustype = data.get('type')
+
+        # Check if required fields are present
+        if not name:
+            return {"error": "Missing name"}, 400
+
+        # Ensure the type is in the allowed types
+        if snustype not in SNUS_TYPES:
+            return {"error": "Invalid snus type"}, 400
+
+        # Insert the snus into the database
         conn = get_db_connection()
         conn.execute("""
-            INSERT INTO snus (name, description, rating, nicotine_g, nicotine_portion, portion_g, type)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (name, description, rating, nicotine_g, nicotine_portion, portion_g, snustype))
+            INSERT INTO snus (name, description, rating, nicotine_g, nicotine_portion, portion_g, weight_g, portions, type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (name, description, rating, nicotine_g, nicotine_portion, portion_g, weight_g, portions, snustype))
+        conn.commit()
+        return Response(status=200)
+    except Exception as e:
+        return {"error": "An error occurred: " + str(e)}, 500
+
+
+@app.route('/api/snus/<int:snusid>', methods=['PATCH'])
+def update_snus(snusid: int):
+    """
+    update a snus
+    ---
+    parameters:
+      - name: snusid
+        type: int
+        required: true
+    responses:
+      200:
+        description: snus updated successfully
+    """
+    try:
+        # Get the data from the request
+        data = request.json
+
+        # Validate the data
+        if not data:
+            return {"error": "No data provided in the request"}, 400
+
+        name = data.get('name')
+        description = data.get('description')
+        rating = data.get('rating')
+        nicotine_g = data.get('nicotine_g')
+        nicotine_portion = data.get('nicotine_portion')
+        portion_g = data.get('portion_g')
+        weight_g = data.get('weight_g')
+        portions = data.get('portions')
+        snustype = data.get('type')
+
+        # Ensure the type is in the allowed types
+        if snustype and snustype not in SNUS_TYPES:
+            return {"error": "Invalid snus type"}, 400
+
+        # Update the snus in the database
+        conn = get_db_connection()
+        if name: conn.execute("UPDATE snus SET name = ? WHERE id = ?", (name, snusid))
+        if description: conn.execute("UPDATE snus SET description = ? WHERE id = ?", (description, snusid))
+        if rating: conn.execute("UPDATE snus SET rating = ? WHERE id = ?", (rating, snusid))
+        if nicotine_g: conn.execute("UPDATE snus SET nicotine_g = ? WHERE id = ?", (nicotine_g, snusid))
+        if nicotine_portion: conn.execute("UPDATE snus SET nicotine_portion = ? WHERE id = ?", (nicotine_portion, snusid))
+        if portion_g: conn.execute("UPDATE snus SET portion_g = ? WHERE id = ?", (portion_g, snusid))
+        if weight_g: conn.execute("UPDATE snus SET weight_g = ? WHERE id = ?", (weight_g, snusid))
+        if portions: conn.execute("UPDATE snus SET portions = ? WHERE id = ?", (portions, snusid))
+        if snustype: conn.execute("UPDATE snus SET type = ? WHERE id = ?", (snustype, snusid))
         conn.commit()
         return Response(status=200)
     except Exception as e:
@@ -216,12 +283,15 @@ def delete_snus(snusid: int):
       200:
         description: snus deleted successfully
     """
-    conn = get_db_connection()
-    conn.execute("DELETE FROM snus WHERE id = ?", (snusid, ))
-    conn.execute("DELETE FROM image WHERE snusid = ?", (snusid, ))
-    conn.execute("DELETE FROM snus_location WHERE snusid = ?", (snusid, ))
-    conn.commit()
-    return Response(status=200)
+    try:
+        conn = get_db_connection()
+        conn.execute("DELETE FROM snus WHERE id = ?", (snusid, ))
+        conn.execute("DELETE FROM image WHERE snusid = ?", (snusid, ))
+        conn.execute("DELETE FROM snus_location WHERE snusid = ?", (snusid, ))
+        conn.commit()
+        return Response(status=200)
+    except Exception as e:
+        return {"error": "An error occurred: " + str(e)}, 500
 
 
 @app.route("/api/snus/from_url", methods=['POST'])
@@ -238,26 +308,26 @@ def add_snus_from_url():
       200:
         description: A list of snus types
     """
-    # Get the data from the request
-    data = request.json
-    
-    # Validate the data
-    if not data:
-        return {"error": "No data provided in the request"}, 400
-    
-    url = data.get('url')
-
-    # Check if required fields are present
-    if not url:
-        return {"error": "Missing url"}, 400
-
     try:
+        # Get the data from the request
+        data = request.json
+
+        # Validate the data
+        if not data:
+            return {"error": "No data provided in the request"}, 400
+
+        url = data.get('url')
+
+        # Check if required fields are present
+        if not url:
+            return {"error": "Missing url"}, 400
+
         snus = import_snus.import_snus(url)
         conn = get_db_connection()
         conn.execute("""
-            INSERT INTO snus (name, description, rating, nicotine_g, nicotine_portion, portion_g, type)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """, (snus.name, snus.description, snus.rating, snus.nicotine_g, snus.nicotine_portion, snus.portion_g, snus.snustype))
+            INSERT INTO snus (name, description, rating, nicotine_g, nicotine_portion, portion_g, weight_g, portions, type)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (snus.name, snus.description, snus.rating, snus.nicotine_g, snus.nicotine_portion, snus.portion_g, snus.weight_g, snus.portions, snus.snustype))
         conn.commit()
         snusid = conn.execute("SELECT MAX(id) FROM snus WHERE name = ?", (snus.name, )).fetchone()[0]
         print(f"id = {snusid}")
@@ -294,9 +364,12 @@ def get_thumbnail(snusid: int):
       200:
         description: An image
     """
-    conn = get_db_connection()
-    image = conn.execute("SELECT file, mime FROM image WHERE snusid = ?", (snusid, )).fetchone()
-    if image is not None:
-        return send_file(io.BytesIO(image[0]), mimetype=image[1])
-    else:
-        return send_file(io.BytesIO(DEFAULT_THUMBNAIL), mimetype='image/webp')
+    try:
+        conn = get_db_connection()
+        image = conn.execute("SELECT file, mime FROM image WHERE snusid = ?", (snusid, )).fetchone()
+        if image is not None:
+            return send_file(io.BytesIO(image[0]), mimetype=image[1])
+        else:
+            return send_file(io.BytesIO(DEFAULT_THUMBNAIL), mimetype='image/webp')
+    except Exception as e:
+        return {"error": "An error occurred: " + str(e)}, 500
