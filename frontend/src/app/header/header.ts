@@ -14,6 +14,7 @@ import { TitleCasePipe } from '@angular/common';
 import { EditSnus } from '../edit-snus/edit-snus';
 import { ImportSnus } from '../import-snus/import-snus';
 import { Backend } from '../../services/backend';
+import { AddLocation } from '../add-location/add-location';
 
 @Component({
   selector: 'app-header',
@@ -52,6 +53,10 @@ export class Header {
     //dialogRef.afterClosed().subscribe(result => {
     //  console.log(`Dialog result: ${result}`);
     //});
+  }
+
+  addLocation() {
+    this.dialog.open(AddLocation);
   }
 
   ngOnInit() {
