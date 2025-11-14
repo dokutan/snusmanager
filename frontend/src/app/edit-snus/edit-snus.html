@@ -2,7 +2,7 @@
     <mat-dialog-content class="mat-typography">
 
         <h1 mat-dialog-title>
-            @if(data.action == "edit"){
+            @if(data.action === "edit"){
             Edit Snus
             }
             @else{
@@ -86,7 +86,7 @@
     </mat-dialog-content>
 
     <mat-dialog-actions>
-        @if(data.action == "edit") {
+        @if(data.action === "edit") {
         <button matButton mat-dialog-close (click)="onDelete(snus.id)">Delete</button>
         }
         <button matButton mat-dialog-close>Cancel</button>

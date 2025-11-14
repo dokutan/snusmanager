@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
@@ -35,9 +35,9 @@ import { Backend } from '../../services/backend';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AddLocation {
-  location: string = "";
+  private service = inject(Backend);
 
-  constructor(private service: Backend){ }
+  location = "";
 
   onSubmit() {
     if(this.location != "") this.service.addLocation(this.location)

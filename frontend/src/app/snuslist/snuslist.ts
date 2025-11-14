@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { Backend } from '../../services/backend';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 
 import { EditSnus } from '../edit-snus/edit-snus';
 
@@ -13,12 +13,12 @@ import { EditSnus } from '../edit-snus/edit-snus';
   templateUrl: './snuslist.html',
   styleUrl: './snuslist.css',
 })
-export class Snuslist {
+export class Snuslist implements OnInit {
+  private service = inject(Backend);
+
   snus: any = [];
 
   readonly dialog: MatDialog = inject(MatDialog);
-
-  constructor(private service: Backend) { }
 
   ngOnInit() {
     this.service.getSnus()

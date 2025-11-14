@@ -1,22 +1,18 @@
-import { Dialog } from '@angular/cdk/dialog';
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, inject, model, signal } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import {
   MAT_DIALOG_DATA,
-  MatDialog,
   MatDialogActions,
   MatDialogClose,
   MatDialogContent,
   MatDialogModule,
-  MatDialogRef,
   MatDialogTitle,
 } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { Injectable } from "@angular/core";
 import { Backend } from '../../services/backend';
 import { Snus } from '../../snus';
 
@@ -40,12 +36,16 @@ import { Snus } from '../../snus';
   styleUrl: './edit-snus.css'
 })
 //@Injectable({ providedIn: 'any' })
-export class EditSnus {
+export class EditSnus implements OnInit {
+  private service = inject(Backend);
+  data = inject<{
+    action: "add" | "edit";
+    id: number | null;
+}>(MAT_DIALOG_DATA);
+
   locations: any = [];
   snustypes: any = [];
   snus: Snus = new Snus();
-
-  constructor(private service: Backend, @Inject(MAT_DIALOG_DATA) public data: {action: "add"|"edit", id: number|null}) { }
 
   ngOnInit() {
     this.service.getLocations()

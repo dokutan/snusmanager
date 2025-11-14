@@ -1,15 +1,14 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule, MatIconButton } from '@angular/material/button';
+import {  MatIconButton } from '@angular/material/button';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatSelectModule } from '@angular/material/select';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { Dialog } from '@angular/cdk/dialog';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { TitleCasePipe } from '@angular/common';
 import { EditSnus } from '../edit-snus/edit-snus';
 import { ImportSnus } from '../import-snus/import-snus';
@@ -34,22 +33,23 @@ import { AddLocation } from '../add-location/add-location';
   templateUrl: './header.html',
   styleUrl: './header.css'
 })
-export class Header {
+export class Header implements OnInit {
+  private service = inject(Backend);
+
   locations: any = [];
   snustypes: any = [];
   searchText: any;
 
   readonly dialog: MatDialog = inject(MatDialog);
 
-  constructor(private service: Backend) { }
-
   addSnus() {
     this.dialog.open(EditSnus, {data: {action: "add"}})
   }
 
   importSnus() {
-    const dialogRef = this.dialog.open(ImportSnus);
+    this.dialog.open(ImportSnus);
 
+    //const dialogRef = this.dialog.open(ImportSnus);
     //dialogRef.afterClosed().subscribe(result => {
     //  console.log(`Dialog result: ${result}`);
     //});

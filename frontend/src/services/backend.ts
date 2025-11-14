@@ -1,17 +1,21 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Snus } from '../snus';
 
 @Injectable({
   providedIn: 'root'
 })
 export class Backend {
+  private httpClient = inject(HttpClient);
+
   private url = 'http://127.0.0.1:5000/api/';
-   
-  constructor(private httpClient: HttpClient) { }
   
   getLocations(){
     return this.httpClient.get(this.url + "locations");
+  }
+
+  addLocation(location: string){
+    return this.httpClient.post(this.url + "locations/" + location, "").subscribe(_response => { });
   }
 
   getSnus(){
