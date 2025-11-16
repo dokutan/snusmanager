@@ -1,22 +1,8 @@
-from dataclasses import dataclass
 from urllib.parse import urlparse
 from urllib.request import urlopen
 import re
 
-@dataclass
-class Snus:
-    name: str = ""
-    description: str = ""
-    rating: int | None = None
-    nicotine_g: float | None = None
-    nicotine_portion: float | None = None
-    portion_g: float | None = None
-    weight_g: float | None = None
-    portions: int | None = None
-    snustype: str = "other"
-    image: bytes | None = None
-    image_mime: str | None = None
-
+from snus import Snus
 
 def mysnus_com(content: str) -> Snus:
     snus = Snus()

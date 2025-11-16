@@ -5,6 +5,9 @@ import sqlite3
 import io
 
 import import_snus
+import calculate_missing
+import crop_image
+from snus import Snus
 
 DATABASE = "db.sqlite"
 SNUS_TYPES = ['loose', 'white', 'original', 'nicotine_pouch', 'other']
@@ -371,5 +374,63 @@ def get_thumbnail(snusid: int):
             return send_file(io.BytesIO(image[0]), mimetype=image[1])
         else:
             return send_file(io.BytesIO(DEFAULT_THUMBNAIL), mimetype='image/webp')
+    except Exception as e:
+        return {"error": "An error occurred: " + str(e)}, 500
+
+
+@app.route("/api/calculate_missing", methods=["POST"])
+def calculate_missing_values():
+    """
+    calculate missing values
+    ---
+      200:
+        description: Ok
+    """
+    try:
+        conn = get_db_connection()
+        all_snus = conn.execute("SELECT * FROM snus").fetchall()
+        result = []
+        for s in all_snus:
+            s = dict(s)
+            snus = Snus()
+            snus.nicotine_g = s["nicotine_g"]
+            snus.nicotine_portion = s["nicotine_portion"]
+            snus.portion_g = s["portion_g"]
+            snus.weight_g = s["weight_g"]
+            snus.portions = s["portions"]
+            snus = calculate_missing.calculate_missing(snus)
+            if snus:
+                result.append({"id": s["id"], "name": s["name"], "solver_status": "satisfied"})
+                conn.execute("UPDATE snus SET nicotine_g = ? WHERE id = ? AND nicotine_g IS NULL", (snus.nicotine_g, s["id"]))
+                conn.execute("UPDATE snus SET nicotine_portion = ? WHERE id = ? AND nicotine_portion IS NULL", (snus.nicotine_portion, s["id"]))
+                conn.execute("UPDATE snus SET portion_g = ? WHERE id = ? AND portion_g IS NULL", (snus.portion_g, s["id"]))
+                conn.execute("UPDATE snus SET weight_g = ? WHERE id = ? AND weight_g IS NULL", (snus.weight_g, s["id"]))
+                conn.execute("UPDATE snus SET portions = ? WHERE id = ? AND portions IS NULL", (snus.portions, s["id"]))
+                conn.commit()
+            else:
+                result.append({"id": s["id"], "name": s["name"], "solver_status": "unsatisfied"})
+        return result
+    except Exception as e:
+        return {"error": "An error occurred: " + str(e)}, 500
+
+
+@app.route("/api/crop_images", methods=["POST"])
+def crop_images():
+    """
+    remove any transparent border around images
+    ---
+      200:
+        description: Ok
+    """
+    try:
+        conn = get_db_connection()
+        images = conn.execute("SELECT id, file FROM image").fetchall()
+        for row in images:
+            cropped = crop_image.crop_image(row[1])
+            if cropped:
+                conn.execute("UPDATE image SET file = ? WHERE id = ?", (cropped, row[0]))
+                conn.execute("UPDATE image SET mime = 'image/png' WHERE id = ?", (row[0], ))
+                conn.commit()
+        return Response(status=200)
     except Exception as e:
         return {"error": "An error occurred: " + str(e)}, 500
