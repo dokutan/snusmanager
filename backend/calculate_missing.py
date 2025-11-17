@@ -3,7 +3,7 @@
 from snus import Snus
 
 def calculate_missing(snus: Snus):
-    from z3 import Real, Solver, sat
+    from z3 import Real, Solver, Or, sat
 
     # define variables
     nicotine_g = Real("nicotine_g")
@@ -32,11 +32,28 @@ def calculate_missing(snus: Snus):
 
     if s.check() == sat:
         m = s.model()
-        snus.nicotine_g = float(m[nicotine_g].as_fraction())
-        snus.nicotine_portion = float(m[nicotine_portion].as_fraction())
-        snus.portion_g = float(m[portion_g].as_fraction())
-        snus.weight_g = float(m[weight_g].as_fraction())
-        snus.portions = float(m[portions].as_fraction())
+        solved_nicotine_g = m[nicotine_g]
+        solved_nicotine_portion = m[nicotine_portion]
+        solved_portion_g = m[portion_g]
+        solved_weight_g = m[weight_g]
+        solved_portions = m[portions]
+
+        # check if the solution is unique
+        s.add(Or(
+            nicotine_g != m[nicotine_g],
+            nicotine_portion != m[nicotine_portion],
+            portion_g != m[portion_g],
+            weight_g != m[weight_g],
+            portions != m[portions],
+        ))
+        if s.check() == sat:
+            return None
+
+        snus.nicotine_g = float(solved_nicotine_g.as_fraction())
+        snus.nicotine_portion = float(solved_nicotine_portion.as_fraction())
+        snus.portion_g = float(solved_portion_g.as_fraction())
+        snus.weight_g = float(solved_weight_g.as_fraction())
+        snus.portions = float(solved_portions.as_fraction())
         return snus
     else:
         return None
