@@ -41,7 +41,8 @@ def init_db():
                 portion_g REAL CHECK(portion_g > 0),
                 weight_g REAL CHECK(weight_g > 0),
                 portions INTEGER CHECK(portions > 0),
-                type TEXT CHECK(type in (%s))
+                type TEXT CHECK(type in (%s)),
+                brand TEXT
             ) STRICT
         """ % ", ".join([f"'{t}'" for t in SNUS_TYPES]))
         conn.execute("""
@@ -74,6 +75,7 @@ app.config['SWAGGER'] = {
     'termsOfService': None,
     'version': "0.1.0"
 }
+app.logger.setLevel("INFO")
 swagger = Swagger(app)
 init_db()
 
@@ -124,6 +126,29 @@ def post_location(name: str):
         return {"error": "An error occurred: " + str(e)}, 500
 
 
+@app.route("/api/locations/<int:locationid>", methods=['DELETE'])
+def delete_location(locationid: int):
+    """
+    delete a location
+    ---
+    parameters:
+      - name: locationid
+        type: int
+        required: true
+    responses:
+      200:
+        description: location deleted successfully
+    """
+    try:
+        conn = get_db_connection()
+        conn.execute("DELETE FROM location WHERE id = ?", (locationid, ))
+        conn.execute("DELETE FROM snus_location WHERE locationid = ?", (locationid, ))
+        conn.commit()
+        return Response(status=200)
+    except Exception as e:
+        return {"error": "An error occurred: " + str(e)}, 500
+
+
 @app.route("/api/snus")
 def get_snus():
     """
@@ -166,10 +191,14 @@ def get_snus_by_id(snusid: int):
     try:
         conn = get_db_connection()
         snus = conn.execute("SELECT * FROM snus WHERE id = ?", (snusid, )).fetchone()
-        if snus is not None:
-            return dict(snus)
-        else:
+        if snus is None:
             return {"error": "No snus with id %s" % snusid}, 400
+        snus = dict(snus)
+        amount_per_location = conn.execute("SELECT locationid, amount FROM snus_location WHERE snusid = ?", (snusid, )).fetchall()
+        snus["locations"] = {}
+        for l in amount_per_location:
+            snus["locations"][l[0]] = l[1]
+        return snus
     except Exception as e:
         return {"error": "An error occurred: " + str(e)}, 500
 
@@ -200,6 +229,7 @@ def add_snus():
         weight_g = data.get('weight_g')
         portions = data.get('portions')
         snustype = data.get('type')
+        brand = data.get('brand')
 
         # Check if required fields are present
         if not name:
@@ -212,9 +242,9 @@ def add_snus():
         # Insert the snus into the database
         conn = get_db_connection()
         conn.execute("""
-            INSERT INTO snus (name, description, rating, nicotine_g, nicotine_portion, portion_g, weight_g, portions, type)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (name, description, rating, nicotine_g, nicotine_portion, portion_g, weight_g, portions, snustype))
+            INSERT INTO snus (name, description, rating, nicotine_g, nicotine_portion, portion_g, weight_g, portions, type, brand)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (name, description, rating, nicotine_g, nicotine_portion, portion_g, weight_g, portions, snustype, brand))
         conn.commit()
         return Response(status=200)
     except Exception as e:
@@ -251,6 +281,8 @@ def update_snus(snusid: int):
         weight_g = data.get('weight_g')
         portions = data.get('portions')
         snustype = data.get('type')
+        brand = data.get('brand')
+        locations = data.get('locations')
 
         # Ensure the type is in the allowed types
         if snustype and snustype not in SNUS_TYPES:
@@ -267,6 +299,12 @@ def update_snus(snusid: int):
         if "weight_g" in data.keys(): conn.execute("UPDATE snus SET weight_g = ? WHERE id = ?", (weight_g, snusid))
         if "portions" in data.keys(): conn.execute("UPDATE snus SET portions = ? WHERE id = ?", (portions, snusid))
         if "type" in data.keys(): conn.execute("UPDATE snus SET type = ? WHERE id = ?", (snustype, snusid))
+        if "brand" in data.keys(): conn.execute("UPDATE snus SET brand = ? WHERE id = ?", (brand, snusid))
+        if locations:
+            for locationid, amount in locations.items():
+                locationid = int(locationid)
+                conn.execute("DELETE FROM snus_location WHERE locationid = ? AND snusid = ?", (locationid, snusid))
+                if amount > 0: conn.execute("INSERT INTO snus_location (locationid, snusid, amount) VALUES (?, ?, ?)", (locationid, snusid, amount))
         conn.commit()
         return Response(status=200)
     except Exception as e:
@@ -328,9 +366,9 @@ def add_snus_from_url():
         snus = import_snus.import_snus(url)
         conn = get_db_connection()
         conn.execute("""
-            INSERT INTO snus (name, description, rating, nicotine_g, nicotine_portion, portion_g, weight_g, portions, type)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (snus.name, snus.description, snus.rating, snus.nicotine_g, snus.nicotine_portion, snus.portion_g, snus.weight_g, snus.portions, snus.snustype))
+            INSERT INTO snus (name, description, rating, nicotine_g, nicotine_portion, portion_g, weight_g, portions, type, brand)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (snus.name, snus.description, snus.rating, snus.nicotine_g, snus.nicotine_portion, snus.portion_g, snus.weight_g, snus.portions, snus.snustype, snus.brand))
         conn.commit()
         snusid = conn.execute("SELECT MAX(id) FROM snus WHERE name = ?", (snus.name, )).fetchone()[0]
         print(f"id = {snusid}")
@@ -431,6 +469,7 @@ def crop_images():
                 conn.execute("UPDATE image SET file = ? WHERE id = ?", (cropped, row[0]))
                 conn.execute("UPDATE image SET mime = 'image/png' WHERE id = ?", (row[0], ))
                 conn.commit()
+                app.logger.info("cropped image %s", row[0])
         return Response(status=200)
     except Exception as e:
         return {"error": "An error occurred: " + str(e)}, 500

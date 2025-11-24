@@ -16,6 +16,8 @@ def mysnus_com(content: str) -> Snus:
         snus.weight_g = float(m.group(1))
     if m := re.search(r'Portions</strong></span> *<span class="ingredient-value">([0-9]+)</span>', content):
         snus.portions = int(m.group(1))
+    if m := re.search(r'Brand</strong></span> *<span class="ingredient-value"><a href="[^"]*" target="[^"]*">([^<]+)</a></span>', content):
+        snus.brand = m.group(1).strip()
     if m := re.search(r'"full":"(https:\\/\\/www.mysnus.com\\/media\\/mf_webp\\/png\\/media\\/catalog\\/product\\/cache\\/[^"]+\\/[^/"]+)"', content):
         image_url = m.group(1).replace("\\/", "/")
         snus.image = urlopen(image_url).read()

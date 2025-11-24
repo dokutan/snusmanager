@@ -11,5 +11,6 @@ class Snus:
     weight_g: float | None = None
     portions: int | None = None
     snustype: str = "other"
+    brand: str | None = None
     image: bytes | None = None
     image_mime: str | None = None
