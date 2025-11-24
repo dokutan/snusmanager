@@ -1,7 +1,7 @@
 <form (ngSubmit)="onSubmit()">
     <mat-dialog-content class="mat-typography">
         <h1 mat-dialog-title>Import snus from a URL</h1>
-        <mat-form-field>
+        <mat-form-field style="width: 100%;" appearance="outline">
             <mat-label>URL</mat-label>
             <input matInput type="url" value="" name="url" [(ngModel)]="url">
         </mat-form-field>

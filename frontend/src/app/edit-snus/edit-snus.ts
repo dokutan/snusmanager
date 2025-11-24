@@ -15,6 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Backend } from '../../services/backend';
 import { Snus } from '../../snus';
+import { MatIcon } from "@angular/material/icon";
 
 @Component({
   selector: 'app-edit-snus',
@@ -30,8 +31,9 @@ import { Snus } from '../../snus';
     MatDialogClose,
     MatSelectModule,
     CommonModule,
-    MatDialogModule
-  ],
+    MatDialogModule,
+    MatIcon
+],
   templateUrl: './edit-snus.html',
   styleUrl: './edit-snus.css'
 })
@@ -57,6 +59,8 @@ export class EditSnus implements OnInit {
         this.snustypes = response;
       });
 
+    this.snus.type = "other";
+
     if(this.data.action == "edit" && this.data.id) {
       this.service.getSnusById(this.data.id)
         .subscribe(response => {
@@ -73,6 +77,7 @@ export class EditSnus implements OnInit {
   }
 
   onSubmit() {
+    console.log(this.snus)
     switch (this.data.action) {
       case "add":
           this.service.addSnus(this.snus);

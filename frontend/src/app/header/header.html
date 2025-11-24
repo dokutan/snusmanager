@@ -1,11 +1,11 @@
 <div style="display: flex;  align-items: baseline; justify-content: space-between; margin: 1em">
     <div style="display: inline;">
-        <h1 style="display: inline;">Snus app</h1>
+        <h1 style="display: inline;">Snusmanager</h1>
 
     </div>
 
     <div>
-        <mat-form-field style="margin-right: 0.5em;">
+        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
             <mat-label>Location</mat-label>
             <mat-select style="display: inline;">
                 <mat-option>All</mat-option>
@@ -16,7 +16,7 @@
         </mat-form-field>
 
 
-        <mat-form-field class="example-form-field">
+        <mat-form-field class="example-form-field" appearance="outline">
             <mat-label>Search</mat-label>
             <input matInput type="text" [(ngModel)]="searchText">
             @if (searchText) {
@@ -36,7 +36,7 @@
             <mat-icon>download</mat-icon>
         </button>
 
-        <button style="margin-left: 0.5em;" matIconButton aria-label="Settings" (click)="addLocation()">
+        <button style="margin-left: 0.5em;" routerLink="/settings" matIconButton aria-label="Settings" >
             <mat-icon>settings</mat-icon>
         </button>
 
@@ -53,7 +53,7 @@
             Filter
         </mat-expansion-panel-header>
 
-        <mat-form-field style="margin-right: 0.5em;">
+        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
             <mat-label>Minimum rating</mat-label>
             <mat-select style="display: inline;">
                 <mat-option value="1">1</mat-option>
@@ -69,7 +69,7 @@
             </mat-select>
         </mat-form-field>
 
-        <mat-form-field style="margin-right: 0.5em;">
+        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
             <mat-label>Type</mat-label>
             <mat-select style="display: inline;">
                 <mat-option>All</mat-option>

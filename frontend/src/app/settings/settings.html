@@ -1,0 +1,22 @@
+<div style="margin: 2em">
+    <h1 routerLink="">Snusmanager</h1>
+    <br>
+
+    <h2>Database</h2>
+    <button matButton (click)="cropImages()">Crop images</button>
+    <br>
+    <button matButton (click)="calculateMissing()"> Calculate values </button>
+
+    <h2>Locations</h2>
+    <button matButton (click)="addLocation()">Add location</button>
+    <mat-list>
+        @for (location of locations; track $index) {
+        <mat-list-item style="display: inline;">{{location.name}}
+            <button matIconButton style="display: inline;" (click)="deleteLocation(location.id)">
+                <mat-icon>delete</mat-icon>
+            </button>
+        <br>
+        </mat-list-item>
+        }
+    </mat-list>
+</div>

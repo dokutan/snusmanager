@@ -1,7 +1,7 @@
 <form (ngSubmit)="onSubmit()">
     <mat-dialog-content class="mat-typography">
         <h1 mat-dialog-title>Add a new location</h1>
-        <mat-form-field>
+        <mat-form-field appearance="outline" style="width: 100%;">
             <mat-label>Location name</mat-label>
             <input matInput type="text" value="" name="location" [(ngModel)]="location">
         </mat-form-field>

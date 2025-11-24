@@ -18,6 +18,10 @@ export class Backend {
     return this.httpClient.post(this.url + "locations/" + location, "").subscribe(_response => { });
   }
 
+  deleteLocation(id: number){
+    return this.httpClient.delete(this.url + "locations/" + id);
+  }
+
   getSnus(){
     return this.httpClient.get(this.url + "snus");
   }
@@ -51,5 +55,13 @@ export class Backend {
 
   deleteSnus(id: number){
     this.httpClient.delete(this.url + "snus/" + id).subscribe(_response => { });
+  }
+
+  cropImages(){
+    this.httpClient.post(this.url + "crop_images", null).subscribe(_response => { });
+  }
+
+  calculateMissing(){
+    this.httpClient.post(this.url + "calculate_missing", null).subscribe(_response => { });
   }
 }

@@ -6,10 +6,11 @@ import { Backend } from '../../services/backend';
 import { MatDialog } from '@angular/material/dialog';
 
 import { EditSnus } from '../edit-snus/edit-snus';
+import { Header } from '../header/header';
 
 @Component({
   selector: 'app-snuslist',
-  imports: [MatCardModule, MatButtonModule, MatGridListModule],
+  imports: [MatCardModule, MatButtonModule, MatGridListModule, Header],
   templateUrl: './snuslist.html',
   styleUrl: './snuslist.css',
 })
@@ -24,10 +25,13 @@ export class Snuslist implements OnInit {
     this.service.getSnus()
       .subscribe(response => {
         this.snus = response;
+        this.snus.sort((a: any, b: any) => a.name.localeCompare(b.name))
       });
   }
 
   editSnus(id: number) {
-    this.dialog.open(EditSnus, {data: {action: "edit", id: id}})
+    this.dialog.open(EditSnus, { data: { action: "edit", id: id } }).afterClosed().subscribe(() => {
+      this.ngOnInit()
+    })
   }
 }

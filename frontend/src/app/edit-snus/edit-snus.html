@@ -1,7 +1,7 @@
 <form (ngSubmit)="onSubmit()">
     <mat-dialog-content class="mat-typography">
 
-        <h1 mat-dialog-title>
+        <h1 mat-dialog-title style="display: inline;">
             @if(data.action === "edit"){
             Edit Snus
             }
@@ -10,39 +10,51 @@
             }
         </h1>
 
-        <mat-form-field style="margin-right: 0.5em;">
+        <button matIconButton>
+            <mat-icon>upload</mat-icon>
+        </button>
+
+        <br>
+        <br>
+
+        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
             <mat-label>Name</mat-label>
             <input matInput type="text" value="" [(ngModel)]="snus.name" name="name">
         </mat-form-field>
 
-        <mat-form-field style="margin-right: 0.5em;">
+        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
             <mat-label>Type</mat-label>
-            <mat-select style="display: inline;" [(ngModel)]="snus.type" name="type">
+            <mat-select style="display: inline;" [(ngModel)]="snus.type" name="type" required>
                 @for (t of snustypes; track t) {
                 <mat-option value="{{t}}">{{t.replace("_", " ") | titlecase}}</mat-option>
                 }
             </mat-select>
         </mat-form-field>
 
-        <mat-form-field style="margin-right: 0.5em;">
+        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
+            <mat-label>Brand</mat-label>
+            <input matInput type="text" value="" [(ngModel)]="snus.brand" name="brand">
+        </mat-form-field>
+
+        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
             <mat-label>Rating</mat-label>
             <mat-select style="display: inline;" [(ngModel)]="snus.rating" name="rating">
-                <mat-option value="1">1</mat-option>
-                <mat-option value="2">2</mat-option>
-                <mat-option value="3">3</mat-option>
-                <mat-option value="4">4</mat-option>
-                <mat-option value="5">5</mat-option>
-                <mat-option value="6">6</mat-option>
-                <mat-option value="7">7</mat-option>
-                <mat-option value="8">8</mat-option>
-                <mat-option value="9">9</mat-option>
-                <mat-option value="10">10</mat-option>
+                <mat-option [value]=1>1</mat-option>
+                <mat-option [value]=2>2</mat-option>
+                <mat-option [value]=3>3</mat-option>
+                <mat-option [value]=4>4</mat-option>
+                <mat-option [value]=5>5</mat-option>
+                <mat-option [value]=6>6</mat-option>
+                <mat-option [value]=7>7</mat-option>
+                <mat-option [value]=8>8</mat-option>
+                <mat-option [value]=9>9</mat-option>
+                <mat-option [value]=10>10</mat-option>
             </mat-select>
         </mat-form-field>
 
         <br>
 
-        <mat-form-field style="margin-right: 0.5em;">
+        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
             <mat-label>Description</mat-label>
             <textarea matInput [(ngModel)]="snus.description" name="description"></textarea>
         </mat-form-field>
@@ -50,23 +62,23 @@
         <br>
 
         <h2>Strength and size</h2>
-        <mat-form-field style="margin-right: 0.5em;">
+        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
             <mat-label>Nicotine mg/g</mat-label>
             <input matInput type="number" value="" [(ngModel)]="snus.nicotine_g" name="nicotine_g">
         </mat-form-field>
-        <mat-form-field style="margin-right: 0.5em;">
+        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
             <mat-label>Nicotine mg/portion</mat-label>
             <input matInput type="number" value="" [(ngModel)]="snus.nicotine_portion" name="nicotine_portion">
         </mat-form-field>
-        <mat-form-field style="margin-right: 0.5em;">
+        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
             <mat-label>Portion size (g)</mat-label>
             <input matInput type="number" value="" [(ngModel)]="snus.portion_g" name="portion_g">
         </mat-form-field>
-        <mat-form-field style="margin-right: 0.5em;">
+        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
             <mat-label>Total weight (g)</mat-label>
             <input matInput type="number" value="" [(ngModel)]="snus.weight_g" name="weight_g">
         </mat-form-field>
-        <mat-form-field style="margin-right: 0.5em;">
+        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
             <mat-label>Portions</mat-label>
             <input matInput type="number" value="" [(ngModel)]="snus.portions" name="portions">
         </mat-form-field>
@@ -74,9 +86,8 @@
 
         <h2>Amount</h2>
         @for (l of locations; track l.name) {
-        {{l.name}}
-        <mat-form-field style="margin-right: 0.5em;">
-            <mat-label>Amount</mat-label>
+        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
+            <mat-label>{{l.name}}</mat-label>
             <input matInput type="number" value="">
         </mat-form-field>
         <br>
@@ -85,11 +96,15 @@
         <br>
     </mat-dialog-content>
 
-    <mat-dialog-actions>
-        @if(data.action === "edit") {
-        <button matButton mat-dialog-close (click)="onDelete(snus.id)">Delete</button>
+    <mat-dialog-actions style="display: flex; justify-content: space-between;">
+        <div>
+            @if(data.action === "edit") {
+        <button style="color: var(--mat-sys-error)" mat-button mat-dialog-close (click)="onDelete(snus.id)">Delete</button>
         }
-        <button matButton mat-dialog-close>Cancel</button>
+        </div>
+        <div>
+            <button matButton mat-dialog-close>Cancel</button>
         <button matButton [mat-dialog-close]="true" cdkFocusInitial type="submit">Ok</button>
+        </div>
     </mat-dialog-actions>
 </form>

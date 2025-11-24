@@ -1,22 +1,28 @@
-<mat-grid-list cols="4">
+<app-header></app-header>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 16px; margin: 2em;">
     @for (s of snus; track s.name) {
-    <mat-grid-tile>
-        <mat-card appearance="outlined" style="max-width: 400px;">
-        <mat-card-header>
+    <mat-card appearance="outlined" style="display: flex; flex-direction: column; height: 100%; border-color: var(--mat-sys-surface-variant)">
+
+        <mat-card-header style="height: 25%;">
             <mat-card-title>{{s.name}}</mat-card-title>
             @if (s.rating) {
-                <mat-card-subtitle>{{s.rating}}/10</mat-card-subtitle>
+            <mat-card-subtitle style="color: var(--mat-sys-secondary);" >{{s.rating}}/10</mat-card-subtitle>
             }
         </mat-card-header>
 
-        <img mat-card-image src="http://127.0.0.1:5000/api/thumbnail/{{s.id}}" alt="{{s.name}}">  
-        <mat-card-content>
 
+        <mat-card-content >
+            <div
+                style="height: auto; display: flex; align-items: flex-start; justify-content: center; margin: 1%; ">
+                <img mat-card-image src="http://127.0.0.1:5000/api/thumbnail/{{s.id}}" alt="{{s.name}}"
+                    style="height: 100%; width: 100%; object-fit: contain;">
+            </div>
         </mat-card-content>
-        <mat-card-actions>
-            <button matButton (click)="editSnus(s.id)">EDIT</button>
+
+        <mat-card-actions style="margin-top: auto;">
+            <button matButton style="margin-left: auto;" (click)="editSnus(s.id)">EDIT</button>
         </mat-card-actions>
-        </mat-card>
-    </mat-grid-tile>
+    </mat-card>
     }
-</mat-grid-list>
+</div>

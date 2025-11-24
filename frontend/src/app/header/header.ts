@@ -14,6 +14,7 @@ import { EditSnus } from '../edit-snus/edit-snus';
 import { ImportSnus } from '../import-snus/import-snus';
 import { Backend } from '../../services/backend';
 import { AddLocation } from '../add-location/add-location';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-header',
@@ -28,8 +29,9 @@ import { AddLocation } from '../add-location/add-location';
     MatFormFieldModule,
     MatInputModule,
     TitleCasePipe,
-    MatDialogModule
-  ],
+    MatDialogModule,
+    RouterLink
+],
   templateUrl: './header.html',
   styleUrl: './header.css'
 })
@@ -43,11 +45,15 @@ export class Header implements OnInit {
   readonly dialog: MatDialog = inject(MatDialog);
 
   addSnus() {
-    this.dialog.open(EditSnus, {data: {action: "add"}})
+    this.dialog.open(EditSnus, {data: {action: "add"}}).afterClosed().subscribe(() => {
+      window.location.reload()
+    })
   }
 
   importSnus() {
-    this.dialog.open(ImportSnus);
+    this.dialog.open(ImportSnus).afterClosed().subscribe(() => {
+      window.location.reload()
+    })
 
     //const dialogRef = this.dialog.open(ImportSnus);
     //dialogRef.afterClosed().subscribe(result => {

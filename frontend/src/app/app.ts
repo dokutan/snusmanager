@@ -1,10 +1,10 @@
 import { Component, signal } from '@angular/core';
-import { Snuslist } from "./snuslist/snuslist";
-import { Header } from "./header/header";
+import { RouterOutlet } from '@angular/router';
+
 
 @Component({
   selector: 'app-root',
-  imports: [Snuslist, Header],
+  imports: [ RouterOutlet ],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
