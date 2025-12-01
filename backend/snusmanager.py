@@ -3,6 +3,7 @@ from flask_cors import CORS
 from flasgger import Swagger
 import sqlite3
 import io
+import base64
 
 import import_snus
 import calculate_missing
@@ -246,6 +247,12 @@ def add_snus():
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (name, description, rating, nicotine_g, nicotine_portion, portion_g, weight_g, portions, snustype, brand))
         conn.commit()
+
+        if "thumbnail_base64" in data.keys() and "thumbnail_mime" in data.keys():
+            snusid = conn.execute("SELECT MAX(id) FROM snus WHERE name = ?", (name, )).fetchone()[0]
+            conn.execute("INSERT INTO image (snusid, file, mime) VALUES (?, ?, ?)", (snusid, base64.decodebytes(data.get("thumbnail_base64").encode("ascii")), data.get("thumbnail_mime")))
+            conn.commit()
+
         return Response(status=200)
     except Exception as e:
         return {"error": "An error occurred: " + str(e)}, 500
@@ -283,6 +290,8 @@ def update_snus(snusid: int):
         snustype = data.get('type')
         brand = data.get('brand')
         locations = data.get('locations')
+        thumbnail_base64 = data.get("thumbnail_base64")
+        thumbnail_mime = data.get("thumbnail_mime")
 
         # Ensure the type is in the allowed types
         if snustype and snustype not in SNUS_TYPES:
@@ -300,6 +309,9 @@ def update_snus(snusid: int):
         if "portions" in data.keys(): conn.execute("UPDATE snus SET portions = ? WHERE id = ?", (portions, snusid))
         if "type" in data.keys(): conn.execute("UPDATE snus SET type = ? WHERE id = ?", (snustype, snusid))
         if "brand" in data.keys(): conn.execute("UPDATE snus SET brand = ? WHERE id = ?", (brand, snusid))
+        if "thumbnail_base64" in data.keys() and "thumbnail_mime" in data.keys():
+            conn.execute("DELETE FROM image WHERE snusid = ?", (snusid, ))
+            conn.execute("INSERT INTO image (snusid, file, mime) VALUES (?, ?, ?)", (snusid, base64.decodebytes(thumbnail_base64.encode("ascii")), thumbnail_mime))
         if locations:
             for locationid, amount in locations.items():
                 locationid = int(locationid)
@@ -371,7 +383,6 @@ def add_snus_from_url():
         """, (snus.name, snus.description, snus.rating, snus.nicotine_g, snus.nicotine_portion, snus.portion_g, snus.weight_g, snus.portions, snus.snustype, snus.brand))
         conn.commit()
         snusid = conn.execute("SELECT MAX(id) FROM snus WHERE name = ?", (snus.name, )).fetchone()[0]
-        print(f"id = {snusid}")
         if snus.image is not None and snus.image_mime is not None:
             conn.execute("INSERT INTO image (snusid, file, mime) VALUES (?, ?, ?)", (snusid, snus.image, snus.image_mime))
             conn.commit()

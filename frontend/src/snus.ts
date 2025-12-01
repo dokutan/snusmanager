@@ -11,4 +11,6 @@ export class Snus {
     type = "";
     brand: string | null = null;
     locations: Map<number | string, number | string> = new Map<number | string, number | string>();
+    thumbnail_base64: string | null = null;
+    thumbnail_mime: string | null = null;
 }

@@ -33,7 +33,7 @@ import { MatIcon } from "@angular/material/icon";
     CommonModule,
     MatDialogModule,
     MatIcon
-],
+  ],
   templateUrl: './edit-snus.html',
   styleUrl: './edit-snus.css'
 })
@@ -43,7 +43,7 @@ export class EditSnus implements OnInit {
   data = inject<{
     action: "add" | "edit";
     id: number | null;
-}>(MAT_DIALOG_DATA);
+  }>(MAT_DIALOG_DATA);
 
   locations: any = [];
   snustypes: any = [];
@@ -61,17 +61,17 @@ export class EditSnus implements OnInit {
 
     this.snus.type = "other";
 
-    if(this.data.action == "edit" && this.data.id) {
+    if (this.data.action == "edit" && this.data.id) {
       this.service.getSnusById(this.data.id)
         .subscribe(response => {
           this.snus = response as Snus;
-          console.log(this.snus)
+          // console.log(this.snus)
         });
     }
   }
 
   onDelete(id: number | null) {
-    if(id) {
+    if (id) {
       this.service.deleteSnus(id);
     }
   }
@@ -80,13 +80,31 @@ export class EditSnus implements OnInit {
     console.log(this.snus)
     switch (this.data.action) {
       case "add":
-          this.service.addSnus(this.snus);
+        this.service.addSnus(this.snus);
         break;
       case "edit":
-          if(this.snus.id) this.service.updateSnus(this.snus.id, this.snus);
+        if (this.snus.id) this.service.updateSnus(this.snus.id, this.snus);
         break;
       default:
         break;
     }
   }
+
+  onFileSelected() {
+    const inputNode: any = document.querySelector('#file');
+
+    if (typeof (FileReader) !== 'undefined') {
+      const reader = new FileReader();
+
+      reader.onload = (e: any) => {
+        const array = Uint16Array.from(new Uint8Array(e.target.result));
+        const binaryString = new TextDecoder("UTF-16").decode(array);
+        this.snus.thumbnail_base64 = btoa(binaryString);
+        this.snus.thumbnail_mime = inputNode.files[0].type;
+      };
+
+      reader.readAsArrayBuffer(inputNode.files[0]);
+    }
+  }
+
 }

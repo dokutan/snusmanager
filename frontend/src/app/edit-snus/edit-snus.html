@@ -10,9 +10,8 @@
             }
         </h1>
 
-        <button matIconButton>
-            <mat-icon>upload</mat-icon>
-        </button>
+        <button matButton (click)="fileInput.click()">New thumbnail</button>
+        <input hidden (change)="onFileSelected()" #fileInput type="file" id="file">
 
         <br>
         <br>
