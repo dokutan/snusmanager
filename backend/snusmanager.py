@@ -1,6 +1,5 @@
 from flask import Flask, Response, request, send_file, send_from_directory
 from flask_cors import CORS
-from flasgger import Swagger
 import sqlite3
 import io
 import base64
@@ -70,14 +69,7 @@ def init_db():
 
 app = Flask(__name__)
 CORS(app)
-app.config['SWAGGER'] = {
-    'title': 'Snusmanager API',
-    'uiversion': 3,
-    'termsOfService': None,
-    'version': "0.1.0"
-}
 app.logger.setLevel("INFO")
-swagger = Swagger(app)
 init_db()
 
 @app.route("/api/locations")
