@@ -15,7 +15,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Backend } from '../../services/backend';
 import { Snus } from '../../snus';
-import { MatIcon } from "@angular/material/icon";
 
 @Component({
   selector: 'app-edit-snus',
@@ -31,8 +30,7 @@ import { MatIcon } from "@angular/material/icon";
     MatDialogClose,
     MatSelectModule,
     CommonModule,
-    MatDialogModule,
-    MatIcon
+    MatDialogModule
   ],
   templateUrl: './edit-snus.html',
   styleUrl: './edit-snus.css'
