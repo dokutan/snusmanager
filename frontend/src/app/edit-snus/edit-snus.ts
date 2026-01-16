@@ -14,7 +14,16 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { Backend } from '../../services/backend';
-import { Snus } from '../../snus';
+import { Snus, LocationAmount } from '../../snus';
+
+class Location {
+  id: number | undefined;
+  name: string | undefined;
+  constructor(id: number, name: string){
+    this.id = id;
+    this.name = name;
+  }
+}
 
 @Component({
   selector: 'app-edit-snus',
@@ -43,14 +52,15 @@ export class EditSnus implements OnInit {
     id: number | null;
   }>(MAT_DIALOG_DATA);
 
-  locations: any = [];
+  locations: Location[] = [];
   snustypes: any = [];
   snus: Snus = new Snus();
+  counts: any = [];
 
   ngOnInit() {
     this.service.getLocations()
       .subscribe(response => {
-        this.locations = response;
+        this.locations = response as Location[];
       });
     this.service.getSnusTypes()
       .subscribe(response => {
@@ -63,7 +73,9 @@ export class EditSnus implements OnInit {
       this.service.getSnusById(this.data.id)
         .subscribe(response => {
           this.snus = response as Snus;
-          // console.log(this.snus)
+          this.snus.locations.forEach((l) => {
+            if(l.id) this.counts[l.id] = l.amount;
+          })
         });
     }
   }
@@ -75,7 +87,14 @@ export class EditSnus implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.snus)
+    // set snus.locations from counts
+    this.snus.locations = []
+    this.locations.forEach((l) => {
+      if(l.id && this.counts[l.id] !== undefined && this.counts[l.id] !== null){
+        this.snus.locations.push(new LocationAmount(l.id, this.counts[l.id]))
+      }
+    })
+
     switch (this.data.action) {
       case "add":
         this.service.addSnus(this.snus);

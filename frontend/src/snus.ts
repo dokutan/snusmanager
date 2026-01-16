@@ -1,3 +1,12 @@
+export class LocationAmount {
+  id: number | undefined;
+  amount: number | undefined;
+  constructor(id: number, amount: number){
+    this.id = id;
+    this.amount = amount;
+  }
+}
+
 export class Snus {
     id: number | null = null;
     name = "";
@@ -10,7 +19,7 @@ export class Snus {
     portions: number | null = null;
     type = "";
     brand: string | null = null;
-    locations: Map<number | string, number | string> = new Map<number | string, number | string>();
+    locations: LocationAmount[] = [];
     thumbnail_base64: string | null = null;
     thumbnail_mime: string | null = null;
 }

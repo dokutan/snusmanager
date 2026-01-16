@@ -85,11 +85,13 @@
 
         <h2>Amount</h2>
         @for (l of locations; track l.name) {
-        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
-            <mat-label>{{l.name}}</mat-label>
-            <input matInput type="number" value="">
-        </mat-form-field>
-        <br>
+            @if (l.id) {
+                <mat-form-field style="margin-right: 0.5em;" appearance="outline">
+                    <mat-label>{{l.name}}</mat-label>
+                    <input [name]="'count_' + l.id" [(ngModel)]="counts[l.id]" matInput type="number" min="0" value="l.count">
+                </mat-form-field>
+                <br>
+            }
         }
 
         <br>

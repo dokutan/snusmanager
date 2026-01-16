@@ -37,7 +37,7 @@ export class Backend {
   addSnus(snus: Snus){
     //this.httpClient.post(this.url + "snus/from_url", {"url": url});
     this.httpClient.post(this.url + "snus", snus).subscribe(response => {
-      console.log(response);
+      // console.log(response);
     });
   }
 

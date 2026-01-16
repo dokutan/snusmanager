@@ -196,9 +196,7 @@ def get_snus_by_id(snusid: int):
             return {"error": "No snus with id %s" % snusid}, 400
         snus = dict(snus)
         amount_per_location = conn.execute("SELECT locationid, amount FROM snus_location WHERE snusid = ?", (snusid, )).fetchall()
-        snus["locations"] = {}
-        for l in amount_per_location:
-            snus["locations"][l[0]] = l[1]
+        snus["locations"] = [{"id": l[0], "amount": l[1]} for l in amount_per_location]
         return snus
     except Exception as e:
         return {"error": "An error occurred: " + str(e)}, 500
@@ -312,9 +310,10 @@ def update_snus(snusid: int):
         if "thumbnail_base64" in data.keys() and "thumbnail_mime" in data.keys():
             conn.execute("DELETE FROM image WHERE snusid = ?", (snusid, ))
             conn.execute("INSERT INTO image (snusid, file, mime) VALUES (?, ?, ?)", (snusid, base64.decodebytes(thumbnail_base64.encode("ascii")), thumbnail_mime))
-        if locations:
-            for locationid, amount in locations.items():
-                locationid = int(locationid)
+        if "locations" in data.keys():
+            for l in locations:
+                locationid = int(l["id"])
+                amount = int(l["amount"])
                 conn.execute("DELETE FROM snus_location WHERE locationid = ? AND snusid = ?", (locationid, snusid))
                 if amount > 0: conn.execute("INSERT INTO snus_location (locationid, snusid, amount) VALUES (?, ?, ?)", (locationid, snusid, amount))
         conn.commit()
