@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Snus } from '../snus';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,7 @@ import { Snus } from '../snus';
 export class Backend {
   private httpClient = inject(HttpClient);
 
-  private url = 'http://127.0.0.1:5000/api/';
+  private readonly url = environment.apiUrl;
   
   getLocations(){
     return this.httpClient.get(this.url + "locations");

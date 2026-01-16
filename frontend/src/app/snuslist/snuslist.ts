@@ -15,6 +15,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { RouterLink } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-snuslist',
@@ -24,6 +25,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 })
 export class Snuslist implements OnInit {
   private service = inject(Backend);
+
+  readonly url = environment.apiUrl;
 
   snus: any = [];
   locations: any = [];

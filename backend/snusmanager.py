@@ -1,4 +1,4 @@
-from flask import Flask, Response, request, send_file
+from flask import Flask, Response, request, send_file, send_from_directory
 from flask_cors import CORS
 from flasgger import Swagger
 import sqlite3
@@ -79,12 +79,6 @@ app.config['SWAGGER'] = {
 app.logger.setLevel("INFO")
 swagger = Swagger(app)
 init_db()
-
-
-@app.route("/")
-def hello_world():
-    return "<p>Hello, World!</p>"
-
 
 @app.route("/api/locations")
 def get_locations():
@@ -483,3 +477,9 @@ def crop_images():
         return Response(status=200)
     except Exception as e:
         return {"error": "An error occurred: " + str(e)}, 500
+
+
+@app.route('/', defaults={'path': 'index.html'})
+@app.route('/<path:path>')
+def catch_all(path):
+    return send_from_directory('dist/snusmanager/browser', path)
