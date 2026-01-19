@@ -51,9 +51,30 @@ def snushus_ch(content: str) -> Snus:
     return snus
 
 
+def snusport_com(content: str) -> Snus:
+    snus = Snus()
+    if m := re.search(r'<h1 class="product_title entry-title">([^<]+)</h1>', content):
+        snus.name = m.group(1).strip()
+    if m := re.search(r'Nicotine Level: ([0-9.,]+) mg/g .([0-9.,]+) mg per pouch.<br />', content):
+        snus.nicotine_g = float(m.group(1).replace(",", "."))
+        snus.nicotine_portion = float(m.group(2).replace(",", "."))
+    if m := re.search(r'Weight: ([0-9.,]+) grams<br />', content):
+        snus.weight_g = float(m.group(1).replace(",", "."))
+    if m := re.search(r'Number of pouches: ([0-9]+)<br />', content):
+        snus.portions = int(m.group(1))
+    if m := re.search(r'Pouch Weight: ([0-9.,]+) g<br />', content):
+        snus.portion_g = float(m.group(1).replace(",", "."))
+    if m := re.search('<meta property="og:image" content="(https://www.snusport.com/wp-content/uploads/[^"]+.png)" />', content):
+        image_url = m.group(1)
+        snus.image = urlopen(image_url).read()
+        snus.image_mime = "image/png"
+    return snus
+
+
 scrapers = {
     "www.mysnus.com": mysnus_com,
     "snushus.ch": snushus_ch,
+    "www.snusport.com": snusport_com
 }
 
 
