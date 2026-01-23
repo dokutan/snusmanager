@@ -5,13 +5,13 @@
     <h2>Database</h2>
     <button matButton (click)="cropImages()">Crop images</button>
     <br>
-    <button matButton (click)="calculateMissing()"> Calculate values </button>
+    <button matButton (click)="calculateMissing()">Calculate values</button>
 
     <h2>Locations</h2>
     <button matButton (click)="addLocation()">Add location</button>
     <mat-list>
         @for (location of locations; track $index) {
-        <mat-list-item style="display: inline;">
+        <mat-list-item >
             <button matIconButton style="display: inline;" (click)="deleteLocation(location.id)">
                 <mat-icon>delete</mat-icon>
             </button>

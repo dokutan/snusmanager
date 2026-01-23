@@ -1,8 +1,5 @@
-<div style="display: flex;  align-items: baseline; justify-content: space-between; margin: 1em">
-    <div style="display: inline;">
-        <h1 style="display: inline;">Snusmanager</h1>
-
-    </div>
+<div style="display: flex;  align-items: baseline; justify-content: space-between; margin: 2em;">
+    <h1 style="vertical-align: top;">Snusmanager</h1>
 
     <div>
         <!-- <mat-form-field style="margin-right: 0.5em;" appearance="outline">
@@ -77,7 +74,7 @@
         @if ((!this.searchType || s.type === this.searchType)
              && (!this.searchRating || s.rating >= this.searchRating)
              && (!this.searchText || s.name.toLowerCase().includes(this.searchText.toLowerCase()))) {
-            <mat-card appearance="outlined" style="display: flex; flex-direction: column; height: 100%; border-color: var(--mat-sys-surface-variant)">
+            <mat-card appearance="outlined" style="display: flex; flex-direction: column; height: 100%; border-color: var(--mat-sys-surface-variant); max-width: 600px;">
 
                 <mat-card-header style="height: 25%;">
                     <mat-card-title>{{s.name}}</mat-card-title>
