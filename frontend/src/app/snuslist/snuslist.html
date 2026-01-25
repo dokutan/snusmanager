@@ -2,15 +2,15 @@
     <h1 style="vertical-align: top;">Snusmanager</h1>
 
     <div>
-        <!-- <mat-form-field style="margin-right: 0.5em;" appearance="outline">
+        <mat-form-field style="margin-right: 0.5em;" appearance="outline">
             <mat-label>Location</mat-label>
-            <mat-select style="display: inline;">
+            <mat-select style="display: inline;" [(ngModel)]="searchLocation" name="searchLocation">
                 <mat-option>All</mat-option>
                 @for (l of locations; track l.name) {
-                <mat-option value="{{l.name}}">{{l.name}}</mat-option>
+                <mat-option value="{{l.id}}">{{l.name}}</mat-option>
                 }
             </mat-select>
-        </mat-form-field> -->
+        </mat-form-field>
 
         <mat-form-field style="margin-right: 0.5em;" appearance="outline">
             <mat-label>Minimum rating</mat-label>
@@ -71,7 +71,8 @@
 
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 16px; margin: 2em;">
     @for (s of snus; track s.name) {
-        @if ((!this.searchType || s.type === this.searchType)
+        @if ((!this.searchLocation || hasSearchLocation(s))
+             && (!this.searchType || s.type === this.searchType)
              && (!this.searchRating || s.rating >= this.searchRating)
              && (!this.searchText || s.name.toLowerCase().includes(this.searchText.toLowerCase()))) {
             <mat-card appearance="outlined" style="display: flex; flex-direction: column; height: 100%; border-color: var(--mat-sys-surface-variant); max-width: 600px;">

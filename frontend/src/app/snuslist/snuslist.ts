@@ -16,6 +16,7 @@ import { MatInputModule } from '@angular/material/input';
 import { RouterLink } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { environment } from '../../environments/environment';
+import { Snus } from '../../snus';
 
 @Component({
   selector: 'app-snuslist',
@@ -34,6 +35,7 @@ export class Snuslist implements OnInit {
   searchText: any;
   searchType: any;
   searchRating: any;
+  searchLocation: any;
 
   readonly dialog: MatDialog = inject(MatDialog);
 
@@ -69,5 +71,9 @@ export class Snuslist implements OnInit {
     this.dialog.open(ImportSnus).afterClosed().subscribe(() => {
       window.location.reload()
     })
+  }
+
+  hasSearchLocation(snus: Snus) {
+    return snus.locations.some(l => l.id === Number(this.searchLocation))
   }
 }

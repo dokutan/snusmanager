@@ -152,16 +152,22 @@ def get_snus():
     """
     try:
         snustype = request.args.get("type")
+        snuslist = []
         if snustype is None:
             conn = get_db_connection()
             snus = conn.execute("SELECT * FROM snus").fetchall()
-            return [dict(s) for s in snus]
+            snuslist = [dict(s) for s in snus]
         elif snustype in SNUS_TYPES:
             conn = get_db_connection()
             snus = conn.execute("SELECT * FROM snus WHERE type = ?", (snustype, )).fetchall()
-            return [dict(s) for s in snus]
+            snuslist = [dict(s) for s in snus]
         else:
             return {"error": "Invalid snus type"}, 400
+
+        for snus in snuslist:
+            amount_per_location = conn.execute("SELECT locationid, amount FROM snus_location WHERE snusid = ?", (snus["id"], )).fetchall()
+            snus["locations"] = [{"id": l[0], "amount": l[1]} for l in amount_per_location]
+        return snuslist
     except Exception as e:
         return {"error": "An error occurred: " + str(e)}, 500
 
