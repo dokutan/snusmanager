@@ -71,10 +71,32 @@ def snusport_com(content: str) -> Snus:
     return snus
 
 
+def buysnus_com(content: str) -> Snus:
+    snus = Snus()
+    if m := re.search(r'<span class="base" data-ui-id="page-title-wrapper" itemprop="name">([^<]+)</span>', content):
+        snus.name = m.group(1).strip()
+    if m := re.search(r'<h3 class="porto-sicon-title">Nicotine Content</h3><p>([0-9.]+) mg/g</p>', content):
+        snus.nicotine_g = float(m.group(1))
+    if m := re.search(r'<span class="ingredient-value">([0-9.]+) mg/Port</span>', content):
+        snus.nicotine_portion = float(m.group(1))
+    if m := re.search(r'<h3 class="porto-sicon-title">Nicotine Weight</h3><p>([0-9.]+) g</p>', content):
+        snus.weight_g = float(m.group(1))
+    if m := re.search(r'<strong>Portions</strong></span> <span class="ingredient-value">([0-9]+)</span>', content):
+        snus.portions = int(m.group(1))
+    if m := re.search(r'<h2 class="product-title" itemprop="brand">([^<]+)</h2>', content):
+        snus.brand = m.group(1).strip()
+    if m := re.search(r'<source +itemprop="image" content="[^"]*" +type="image/webp" +srcset="([^"]+.webp)">', content):
+        image_url = m.group(1)
+        snus.image = urlopen(image_url).read()
+        snus.image_mime = "image/webp"
+    return snus
+
+
 scrapers = {
     "www.mysnus.com": mysnus_com,
     "snushus.ch": snushus_ch,
-    "www.snusport.com": snusport_com
+    "www.snusport.com": snusport_com,
+    "www.buysnus.com": buysnus_com
 }
 
 
