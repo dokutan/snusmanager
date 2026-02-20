@@ -62,6 +62,10 @@ export class Backend {
     this.httpClient.post(this.url + "crop_images", null).subscribe(_response => { });
   }
 
+  convertImages(){
+    this.httpClient.post(this.url + "convert_images", null).subscribe(_response => { });
+  }
+
   calculateMissing(){
     this.httpClient.post(this.url + "calculate_missing", null).subscribe(_response => { });
   }

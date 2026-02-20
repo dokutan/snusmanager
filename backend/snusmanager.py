@@ -7,6 +7,7 @@ import base64
 import import_snus
 import calculate_missing
 import crop_image
+import convert_image
 from snus import Snus
 
 DATABASE = "db.sqlite"
@@ -409,7 +410,7 @@ def get_thumbnail(snusid: int):
     """
     try:
         conn = get_db_connection()
-        image = conn.execute("SELECT file, mime FROM image WHERE snusid = ?", (snusid, )).fetchone()
+        image = conn.execute("SELECT file, mime FROM image WHERE snusid = ? ORDER BY CASE WHEN mime = 'image/webp' THEN 1 ELSE 2 END", (snusid, )).fetchone()
         if image is not None:
             return send_file(io.BytesIO(image[0]), mimetype=image[1])
         else:
@@ -472,6 +473,28 @@ def crop_images():
                 conn.execute("UPDATE image SET mime = 'image/png' WHERE id = ?", (row[0], ))
                 conn.commit()
                 app.logger.info("cropped image %s", row[0])
+        return Response(status=200)
+    except Exception as e:
+        return {"error": "An error occurred: " + str(e)}, 500
+
+
+@app.route("/api/convert_images", methods=["POST"])
+def convert_images():
+    """
+    create webp versions of all images
+    ---
+      200:
+        description: Ok
+    """
+    try:
+        conn = get_db_connection()
+        images = conn.execute("SELECT snusid, file FROM image WHERE snusid NOT IN (SELECT DISTINCT snusid FROM image WHERE mime = 'image/webp')").fetchall()
+        for row in images:
+            converted = convert_image.convert_image(row[1])
+            if converted:
+                conn.execute("INSERT INTO image (snusid, file, mime) VALUES (?, ?, ?)", (row[0], converted, "image/webp"))
+                conn.commit()
+                app.logger.info("converted image %s to webp", row[0])
         return Response(status=200)
     except Exception as e:
         return {"error": "An error occurred: " + str(e)}, 500

@@ -30,6 +30,10 @@ export class Settings implements OnInit {
     this.service.cropImages()
   }
 
+  convertImages() {
+    this.service.convertImages()
+  }
+
   calculateMissing() {
     this.service.calculateMissing()
   }
