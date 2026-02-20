@@ -1,4 +1,4 @@
-<div style="display: flex;  align-items: baseline; justify-content: space-between; margin: 2em;">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; margin: 2em;">
     <h1 style="vertical-align: top;">Snusmanager</h1>
 
     <div>
@@ -69,7 +69,7 @@
     </div>
 </div>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 16px; margin: 2em;">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 500px), 1fr)); gap: 16px; margin: 2em;">
     @for (s of snus; track s.name) {
         @if ((!this.searchLocation || hasSearchLocation(s))
              && (!this.searchType || s.type === this.searchType)
