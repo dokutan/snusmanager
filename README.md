@@ -26,6 +26,6 @@ gunicorn snusmanager:app --bind "[::]:8000"
 cd frontend
 ng build
 cd ..
-podman build . -t snusmanager
-podman run -it -p 8000:8000 -v ./db.sqlite:/app/db.sqlite localhost/snusmanager:latest
+podman build . -t ghcr.io/dokutan/snusmanager:latest
+podman run -it -p 8000:8000 -v ./db/:/app/db/ ghcr.io/dokutan/snusmanager:latest
 ```

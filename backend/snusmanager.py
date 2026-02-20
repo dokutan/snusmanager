@@ -2,6 +2,7 @@ from flask import Flask, Response, request, send_file, send_from_directory
 from flask_cors import CORS
 import sqlite3
 import io
+import os
 import base64
 
 import import_snus
@@ -10,7 +11,7 @@ import crop_image
 import convert_image
 from snus import Snus
 
-DATABASE = "db.sqlite"
+DATABASE = os.environ.get("SNUSMANAGER_DB", "db.sqlite")
 SNUS_TYPES = ['loose', 'white', 'original', 'nicotine_pouch', 'other']
 DEFAULT_THUMBNAIL = None
 with open("default_thumbnail.webp", "rb") as f:
