@@ -3,7 +3,7 @@
 A selfhosted snus collection manager.
 
 Features:
-- import snus from multiple sites
+- import snus from [multiple sites](backend/import_snus.py)
 - track inventory across multiple locations
 
 Planned features:
