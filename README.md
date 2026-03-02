@@ -6,6 +6,11 @@ Features:
 - import snus from multiple sites
 - track inventory across multiple locations
 
+Planned features:
+- track snus usage
+
+![screenshot](screenshot.png)
+
 ## Getting started
 
 ```sh
@@ -16,6 +21,8 @@ mkdir db
 docker run -it -p 8000:8000 -v ./db/:/app/db/ ghcr.io/dokutan/snusmanager:latest
 # or
 podman run -it -p 8000:8000 -v ./db/:/app/db/ ghcr.io/dokutan/snusmanager:latest
+
+# 3. visit http://localhost:8000
 ```
 
 ## Development
