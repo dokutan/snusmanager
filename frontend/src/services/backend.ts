@@ -27,6 +27,14 @@ export class Backend {
     return this.httpClient.get(this.url + "snus");
   }
 
+  getSnusBlob(){
+    return this.httpClient.get(this.url + "snus?images=1", { responseType: 'blob' });
+  }
+
+  addSnusBlob(data: any){
+    return this.httpClient.post(this.url + "snus", data);
+  }
+
   getSnusById(id: number){
     return this.httpClient.get(this.url + "snus/" + id);
   }

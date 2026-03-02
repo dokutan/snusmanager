@@ -3,11 +3,16 @@
     <br>
 
     <h2>Database</h2>
-    <button matButton (click)="cropImages()">Crop images</button>
-    <h2>Database</h2>
-    <button matButton (click)="convertImages()">Convert images to webp</button>
+    <button matButton (click)="cropImages()">Crop images</button> Removes transparent areas around the images.
     <br>
-    <button matButton (click)="calculateMissing()">Calculate values</button>
+    <button matButton (click)="convertImages()">Convert images to webp</button> Improves performance and keeps the original images in the database.
+    <br>
+    <button matButton (click)="calculateMissing()">Calculate values</button> Calculates missing values, e.g. nicotine per portion from portion weight and nicotine per gram.
+    <br>
+    <button matButton (click)="exportSnus()">Export snus</button> Download every snus and image as json.
+    <br>
+    <button matButton (click)="importSnus()">Import snus</button> Import snus from an exported json file.
+    <input type="file" accept="application/json" (change)="onFileSelected($event)" style="margin-left: 1em;">
 
     <h2>Locations</h2>
     <button matButton (click)="addLocation()">Add location</button>

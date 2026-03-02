@@ -154,6 +154,7 @@ def get_snus():
     """
     try:
         snustype = request.args.get("type")
+        get_images = request.args.get("images")
         snuslist = []
         if snustype is None:
             conn = get_db_connection()
@@ -169,6 +170,11 @@ def get_snus():
         for snus in snuslist:
             amount_per_location = conn.execute("SELECT locationid, amount FROM snus_location WHERE snusid = ?", (snus["id"], )).fetchall()
             snus["locations"] = [{"id": l[0], "amount": l[1]} for l in amount_per_location]
+            if get_images:
+                conn = get_db_connection()
+                images = conn.execute("SELECT file, mime FROM image WHERE snusid = ?", (snus["id"], )).fetchall()
+                snus["images"] = [{"mime": i["mime"], "file": base64.b64encode(i["file"]).decode("ascii")} for i in images]
+
         return snuslist
     except Exception as e:
         return {"error": "An error occurred: " + str(e)}, 500
@@ -207,43 +213,59 @@ def add_snus():
     """
     try:
         # Get the data from the request
-        data = request.json
+        all_data = request.json
 
         # Validate the data
-        if not data:
-            return {"error": "No data provided in the request"}, 400
+        if isinstance(all_data, dict):
+            all_data = [all_data]
+        elif not isinstance(all_data, list):
+            return {"error": "Invalid data provided in the request"}, 400
 
-        name = data.get('name')
-        description = data.get('description')
-        rating = data.get('rating')
-        nicotine_g = data.get('nicotine_g')
-        nicotine_portion = data.get('nicotine_portion')
-        portion_g = data.get('portion_g')
-        weight_g = data.get('weight_g')
-        portions = data.get('portions')
-        snustype = data.get('type')
-        brand = data.get('brand')
+        for data in all_data:
+            name = data.get('name')
+            description = data.get('description')
+            rating = data.get('rating')
+            nicotine_g = data.get('nicotine_g')
+            nicotine_portion = data.get('nicotine_portion')
+            portion_g = data.get('portion_g')
+            weight_g = data.get('weight_g')
+            portions = data.get('portions')
+            snustype = data.get('type')
+            brand = data.get('brand')
 
-        # Check if required fields are present
-        if not name:
-            return {"error": "Missing name"}, 400
+            conn = get_db_connection()
 
-        # Ensure the type is in the allowed types
-        if snustype not in SNUS_TYPES:
-            return {"error": "Invalid snus type"}, 400
+            # Check if required fields are present
+            if not name:
+                return {"error": "Missing name"}, 400
 
-        # Insert the snus into the database
-        conn = get_db_connection()
-        conn.execute("""
-            INSERT INTO snus (name, description, rating, nicotine_g, nicotine_portion, portion_g, weight_g, portions, type, brand)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (name, description, rating, nicotine_g, nicotine_portion, portion_g, weight_g, portions, snustype, brand))
-        conn.commit()
+            # Ensure name doesn't exist, continue without error to allow bulk imports
+            if conn.execute("SELECT COUNT(*) FROM snus WHERE name = ?", (name, )).fetchone()[0] > 0:
+                continue
 
-        if "thumbnail_base64" in data.keys() and "thumbnail_mime" in data.keys():
-            snusid = conn.execute("SELECT MAX(id) FROM snus WHERE name = ?", (name, )).fetchone()[0]
-            conn.execute("INSERT INTO image (snusid, file, mime) VALUES (?, ?, ?)", (snusid, base64.decodebytes(data.get("thumbnail_base64").encode("ascii")), data.get("thumbnail_mime")))
+            # Ensure the type is in the allowed types
+            if snustype not in SNUS_TYPES:
+                return {"error": "Invalid snus type"}, 400
+
+            # Insert the snus into the database
+            conn.execute("""
+                INSERT INTO snus (name, description, rating, nicotine_g, nicotine_portion, portion_g, weight_g, portions, type, brand)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (name, description, rating, nicotine_g, nicotine_portion, portion_g, weight_g, portions, snustype, brand))
             conn.commit()
+
+            # Add images
+            for image in data.get("images", []):
+                if "file" in image.keys() and "mime" in image.keys():
+                    snusid = conn.execute("SELECT MAX(id) FROM snus WHERE name = ?", (name, )).fetchone()[0]
+                    conn.execute("INSERT INTO image (snusid, file, mime) VALUES (?, ?, ?)", (snusid, base64.decodebytes(image.get("file").encode("ascii")), image.get("mime")))
+                    conn.commit()
+
+            # TODO ? replace thumbnail_base64+thumbnail_mime with images/file+images/mime in the frontend
+            if "thumbnail_base64" in data.keys() and "thumbnail_mime" in data.keys():
+                snusid = conn.execute("SELECT MAX(id) FROM snus WHERE name = ?", (name, )).fetchone()[0]
+                conn.execute("INSERT INTO image (snusid, file, mime) VALUES (?, ?, ?)", (snusid, base64.decodebytes(data.get("thumbnail_base64").encode("ascii")), data.get("thumbnail_mime")))
+                conn.commit()
 
         return Response(status=200)
     except Exception as e:
