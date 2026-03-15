@@ -61,6 +61,10 @@ export class Snuslist implements OnInit {
     })
   }
 
+  addSnusUsage(id: number) {
+    this.service.addSnusUsage(id)
+  }
+
   addSnus() {
     this.dialog.open(EditSnus, { data: { action: "add" } }).afterClosed().subscribe(() => {
       window.location.reload()

@@ -66,6 +66,14 @@ def init_db():
                 FOREIGN KEY(locationid) REFERENCES location(id)
             ) STRICT
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS snus_usage (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                snusid INTEGER,
+                timestamp TEXT NOT NULL,
+                FOREIGN KEY(snusid) REFERENCES snus(id)
+            ) STRICT
+        """)
         conn.commit()
 
 
@@ -401,6 +409,28 @@ def add_snus_from_url():
         if snus.image is not None and snus.image_mime is not None:
             conn.execute("INSERT INTO image (snusid, file, mime) VALUES (?, ?, ?)", (snusid, snus.image, snus.image_mime))
             conn.commit()
+        return Response(status=200)
+    except Exception as e:
+        return {"error": "An error occurred: " + str(e)}, 500
+
+
+@app.route("/api/usage/<int:snusid>", methods=['POST'])
+def add_snus_usage(snusid: int):
+    """
+    track snus usage
+    ---
+    parameters:
+      - name: snusid
+        type: int
+        required: true
+    responses:
+      200:
+        description: snus deleted successfully
+    """
+    try:
+        conn = get_db_connection()
+        conn.execute("INSERT INTO snus_usage (snusid, timestamp) VALUES ((SELECT CASE WHEN 0 < (SELECT count(*) FROM snus WHERE id = ?) THEN ? ELSE NULL END), strftime('%FT%TZ'))", (snusid, snusid))
+        conn.commit()
         return Response(status=200)
     except Exception as e:
         return {"error": "An error occurred: " + str(e)}, 500

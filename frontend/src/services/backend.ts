@@ -50,6 +50,12 @@ export class Backend {
     });
   }
 
+  addSnusUsage(id: number){
+    this.httpClient.post(this.url + "usage/" + id, "").subscribe(response => {
+      // console.log(response);
+    });
+  }
+
   updateSnus(id: number, snus: Snus){
     this.httpClient.patch(this.url + "snus/" + id, snus).subscribe(_response => { });
   }
