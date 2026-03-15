@@ -51,9 +51,7 @@ export class Backend {
   }
 
   addSnusUsage(id: number){
-    this.httpClient.post(this.url + "usage/" + id, "").subscribe(response => {
-      // console.log(response);
-    });
+    return this.httpClient.post(this.url + "usage/" + id, "", {observe: 'response'})
   }
 
   updateSnus(id: number, snus: Snus){

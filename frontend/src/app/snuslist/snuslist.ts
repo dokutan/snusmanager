@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { Backend } from '../../services/backend';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ImportSnus } from '../import-snus/import-snus';
 import { EditSnus } from '../edit-snus/edit-snus';
 import { MatFormField, MatFormFieldModule, MatLabel } from "@angular/material/form-field";
@@ -38,6 +38,7 @@ export class Snuslist implements OnInit {
   searchLocation: any;
 
   readonly dialog: MatDialog = inject(MatDialog);
+  readonly snackBar: MatSnackBar = inject(MatSnackBar);
 
   ngOnInit() {
     this.service.getSnus()
@@ -62,7 +63,10 @@ export class Snuslist implements OnInit {
   }
 
   addSnusUsage(id: number) {
-    this.service.addSnusUsage(id)
+    this.service.addSnusUsage(id).subscribe(response => {
+      if(response.ok)
+        this.snackBar.open('Usage added', undefined, {duration: 500});
+    })
   }
 
   addSnus() {
