@@ -1,8 +1,15 @@
 from urllib.parse import urlparse
-from urllib.request import urlopen
+import urllib.request
 import re
 
 from snus import Snus
+
+
+def urlopen(url):
+    "Custom urlopen with different default user agent."
+    req = urllib.request.Request(url, headers={"User-Agent": ""})
+    return urllib.request.urlopen(req)
+
 
 def mysnus_com(content: str) -> Snus:
     snus = Snus()
@@ -85,7 +92,7 @@ def buysnus_com(content: str) -> Snus:
         snus.portions = int(m.group(1))
     if m := re.search(r'<h2 class="product-title" itemprop="brand">([^<]+)</h2>', content):
         snus.brand = m.group(1).strip()
-    if m := re.search(r'<source +itemprop="image" content="[^"]*" +type="image/webp" +srcset="([^"]+.webp)">', content):
+    if m := re.search(r'<source +content="[^"]*" +type="image/webp" +srcset="([^"]+.webp)">', content):
         image_url = m.group(1)
         snus.image = urlopen(image_url).read()
         snus.image_mime = "image/webp"

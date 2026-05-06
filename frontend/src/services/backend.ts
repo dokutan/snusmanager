@@ -61,9 +61,7 @@ export class Backend {
   importSnus(url: string){
     console.log("import: " + url);
     //this.httpClient.post(this.url + "snus/from_url", {"url": url});
-    this.httpClient.post(this.url + "snus/from_url", {"url": url}).subscribe(response => {
-      console.log(response);
-    });
+    return this.httpClient.post(this.url + "snus/from_url", {"url": url}, {observe: 'response'})
   }
 
   deleteSnus(id: number){

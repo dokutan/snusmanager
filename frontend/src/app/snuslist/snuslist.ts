@@ -77,7 +77,7 @@ export class Snuslist implements OnInit {
 
   importSnus() {
     this.dialog.open(ImportSnus).afterClosed().subscribe(() => {
-      window.location.reload()
+      this.ngOnInit()
     })
   }
 

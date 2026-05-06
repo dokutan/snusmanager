@@ -6,6 +6,7 @@ import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, Ma
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Backend } from '../../services/backend';
 
 @Component({
@@ -30,10 +31,16 @@ import { Backend } from '../../services/backend';
 })
 export class ImportSnus {
   private service = inject(Backend);
+  readonly snackBar: MatSnackBar = inject(MatSnackBar);
 
   url = "";
 
   onSubmit() {
-    this.service.importSnus(this.url)
+    this.service.importSnus(this.url).subscribe(response => {
+      if(response.ok)
+        this.snackBar.open('Imported snus', undefined, {duration: 500});
+      else
+        this.snackBar.open('Failed to import Snus', undefined, {duration: 500});
+    })
   }
 }
