@@ -71,7 +71,7 @@ export class Snuslist implements OnInit {
 
   addSnus() {
     this.dialog.open(EditSnus, { data: { action: "add" } }).afterClosed().subscribe(() => {
-      window.location.reload()
+      this.ngOnInit()
     })
   }
 
@@ -83,5 +83,10 @@ export class Snuslist implements OnInit {
 
   hasSearchLocation(snus: Snus) {
     return snus.locations.some(l => l.id === Number(this.searchLocation))
+  }
+
+  amountInSearchLocation(snus: Snus) {
+    const searchLocation = snus.locations.filter(l => l.id === Number(this.searchLocation))
+    return searchLocation.length > 0 ? searchLocation[0].amount : null
   }
 }
