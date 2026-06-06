@@ -1,6 +1,8 @@
 from urllib.parse import urlparse
 import urllib.request
 import re
+import magic
+from extruct import extract
 
 from snus import Snus
 
@@ -9,6 +11,27 @@ def urlopen(url):
     "Custom urlopen with different default user agent."
     req = urllib.request.Request(url, headers={"User-Agent": ""})
     return urllib.request.urlopen(req)
+
+
+def get_json_ld_product(content: str) -> Snus:
+    "Get the basic information about a snus from embedded schema.org json-ld product data."
+    data = extract(content)
+    snus = Snus()
+
+    for product in data.get("json-ld", []):
+        if product.get("@type") == "Product" and not isinstance(product, list):
+            snus.name = product.get("name", "")
+            snus.description = product.get("description", "")
+            if "brand" in product.keys() and "name" in product["brand"].keys():
+                snus.brand = product["brand"]["name"]
+            image_url = product.get("image", None)
+            if isinstance(image_url, str):
+                snus.image = urlopen(image_url).read()
+                snus.image_mime = magic.from_buffer(snus.image, mime=True)
+            break
+
+    return snus
+
 
 
 def mysnus_com(content: str) -> Snus:
@@ -99,11 +122,45 @@ def buysnus_com(content: str) -> Snus:
     return snus
 
 
+def swedishmatch_se(content: str) -> Snus:
+    snus = get_json_ld_product(content)
+    if m := re.search(r'Nettovikt/dosa</td><td[^>]*>([0-9.,]+) *g', content):
+        snus.weight_g = float(m.group(1).replace(",", "."))
+    if m := re.search(r'Antal prillor/dosa</td><td[^>]*>([0-9]+) *st', content):
+        snus.portions = int(m.group(1))
+    return snus
+
+
+def skruf_se(content: str) -> Snus:
+    snus = Snus()
+    if m := re.search(r'<title>([^<]+)-', content):
+        snus.name = m.group(1).strip()
+    if m := re.search(r'Nikotinhalt mg/g:</span><strong class="fact-item__value">([0-9.,]+) +mg/g', content):
+        snus.nicotine_g = float(m.group(1).replace(",", "."))
+    if m := re.search(r'Nikotinhalt / påse:</span><strong class="fact-item__value">([0-9.,]+) +mg/portion', content):
+        snus.nicotine_portion = float(m.group(1).replace(",", "."))
+    if m := re.search(r'Vikt dosa:</span><strong class="fact-item__value">([0-9.,]+) +g', content):
+        snus.weight_g = float(m.group(1).replace(",", "."))
+    if m := re.search(r'<strong class="fact-item__value">([0-9]+) +st', content):
+        snus.portions = int(m.group(1))
+    if m := re.search(r'Vikt prilla:</span><strong class="fact-item__value">([0-9.,]+) +g', content):
+        snus.portion_g = float(m.group(1).replace(",", "."))
+    if m := re.search(r'<h1 class="product-article__title">([^<]+)<br>', content):
+        snus.brand = m.group(1).strip()
+    if m := re.search(r'src="([^"]+.webp)" class="product-article__video-image"', content):
+        image_url = m.group(1)
+        snus.image = urlopen(image_url).read()
+        snus.image_mime = "image/webp"
+    return snus
+
+
 scrapers = {
     "www.mysnus.com": mysnus_com,
     "snushus.ch": snushus_ch,
     "www.snusport.com": snusport_com,
-    "www.buysnus.com": buysnus_com
+    "www.buysnus.com": buysnus_com,
+    "www.swedishmatch.se": swedishmatch_se,
+    "skruf.se": skruf_se,
 }
 
 

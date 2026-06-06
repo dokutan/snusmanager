@@ -411,6 +411,7 @@ def add_snus_from_url():
             conn.commit()
         return Response(status=200)
     except Exception as e:
+        app.logger.exception("failed to import snus from %s: %s", url, str(e))
         return {"error": "An error occurred: " + str(e)}, 500
 
 
